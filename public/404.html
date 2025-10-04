@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página No Encontrada</title>
+    
+    <!-- Materialize CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="grey lighten-4">
+    <!-- Navigation -->
+    <nav class="orange darken-2">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Sistema Auth</a>
+            <ul class="right hide-on-med-and-down">
+                <li><span id="nav-user" style="display: none;"></span></li>
+                <li><a href="#" onclick="authManager.logout()" id="nav-logout" style="display: none;">
+                    <i class="material-icons left">exit_to_app</i>Cerrar Sesión
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="error-page">
+            <div class="row">
+                <div class="col s12 center-align">
+                    <div class="error-code orange-text">404</div>
+                    <h4 class="orange-text text-darken-2">Página No Encontrada</h4>
+                    <p class="flow-text grey-text text-darken-1">
+                        La página que estás buscando no existe o ha sido movida.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col s12 m8 offset-m2">
+                    <div class="card orange lighten-5">
+                        <div class="card-content center-align">
+                            <i class="material-icons large orange-text">search_off</i>
+                            <h5 class="orange-text text-darken-2">¡Oops! Ruta Inexistente</h5>
+                            <p>La URL que intentas acceder no corresponde a ninguna página válida del sistema.</p>
+                            <p>Verifica que la dirección esté escrita correctamente o navega desde el menú principal.</p>
+                        </div>
+                        <div class="card-action center-align">
+                            <a href="/" class="btn blue darken-2">
+                                <i class="material-icons left">home</i>
+                                Ir al Inicio
+                            </a>
+                            <a href="#" onclick="goBack()" class="btn grey darken-2">
+                                <i class="material-icons left">arrow_back</i>
+                                Volver Atrás
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Páginas disponibles -->
+            <div class="row">
+                <div class="col s12 m6">
+                    <div class="card white">
+                        <div class="card-content">
+                            <span class="card-title orange-text">
+                                <i class="material-icons left">map</i>
+                                Páginas Disponibles
+                            </span>
+                            <ul class="collection">
+                                <li class="collection-item">
+                                    <a href="/signin.html" class="blue-text">
+                                        <i class="material-icons left">login</i>
+                                        Iniciar Sesión
+                                    </a>
+                                </li>
+                                <li class="collection-item">
+                                    <a href="/signup.html" class="green-text">
+                                        <i class="material-icons left">person_add</i>
+                                        Registrarse
+                                    </a>
+                                </li>
+                                <li class="collection-item" id="user-pages" style="display: none;">
+                                    <a href="/user-dashboard.html" class="purple-text">
+                                        <i class="material-icons left">dashboard</i>
+                                        Dashboard Usuario
+                                    </a>
+                                </li>
+                                <li class="collection-item" id="admin-pages" style="display: none;">
+                                    <a href="/admin-dashboard.html" class="red-text">
+                                        <i class="material-icons left">admin_panel_settings</i>
+                                        Dashboard Admin
+                                    </a>
+                                </li>
+                                <li class="collection-item" id="profile-page" style="display: none;">
+                                    <a href="/profile.html" class="teal-text">
+                                        <i class="material-icons left">person</i>
+                                        Mi Perfil
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6">
+                    <div class="card white">
+                        <div class="card-content">
+                            <span class="card-title orange-text">
+                                <i class="material-icons left">lightbulb_outline</i>
+                                Sugerencias
+                            </span>
+                            <ul class="collection">
+                                <li class="collection-item">
+                                    <i class="material-icons left">check</i>
+                                    Verifica la URL en la barra de direcciones
+                                </li>
+                                <li class="collection-item">
+                                    <i class="material-icons left">check</i>
+                                    Usa el menú de navegación principal
+                                </li>
+                                <li class="collection-item">
+                                    <i class="material-icons left">check</i>
+                                    Asegúrate de estar autenticado
+                                </li>
+                                <li class="collection-item">
+                                    <i class="material-icons left">check</i>
+                                    Verifica tus permisos de acceso
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información del error -->
+            <div class="row">
+                <div class="col s12">
+                    <div class="card grey lighten-4">
+                        <div class="card-content">
+                            <span class="card-title grey-text text-darken-2">
+                                <i class="material-icons left">info</i>
+                                Información Técnica
+                            </span>
+                            <p><strong>URL solicitada:</strong> <code id="current-url"></code></p>
+                            <p><strong>Código de error:</strong> 404 - Not Found</p>
+                            <p><strong>Timestamp:</strong> <span id="error-timestamp"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/app.js"></script>
+    
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Materialize
+            M.AutoInit();
+            
+            // Mostrar información del error
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('error-timestamp').textContent = new Date().toLocaleString('es-ES');
+            
+            // Mostrar páginas disponibles según el estado de autenticación
+            if (authManager.isAuthenticated()) {
+                authManager.updateNavigation();
+                
+                // Mostrar enlaces para usuarios autenticados
+                document.getElementById('user-pages').style.display = 'block';
+                document.getElementById('profile-page').style.display = 'block';
+                
+                // Mostrar enlaces de admin si corresponde
+                if (authManager.hasRole('admin')) {
+                    document.getElementById('admin-pages').style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

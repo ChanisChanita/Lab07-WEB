@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Usuario - Sistema de Autenticación</title>
+    
+    <!-- Materialize CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="grey lighten-4">
+    <!-- Navigation -->
+    <nav class="blue darken-2">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Sistema Auth</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/profile.html">
+                    <i class="material-icons left">person</i>Mi Perfil
+                </a></li>
+                <li><span id="nav-user" style="display: none; margin-right: 20px;"></span></li>
+                <li><a href="#" onclick="authManager.logout()" id="nav-logout" style="display: none;">
+                    <i class="material-icons left">exit_to_app</i>Cerrar Sesión
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container dashboard-container">
+        <!-- Loading -->
+        <div class="loading" style="display: none;">
+            <div class="center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>Cargando dashboard...</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" style="display: none;">
+            <!-- Welcome Section -->
+            <div class="row">
+                <div class="col s12">
+                    <div class="card blue lighten-5">
+                        <div class="card-content">
+                            <span class="card-title blue-text text-darken-2">
+                                <i class="material-icons left">waving_hand</i>
+                                <span id="welcome-message">Bienvenido, aquí están tus datos</span>
+                            </span>
+                            <p class="flow-text">¡Te damos la bienvenida a tu panel de usuario!</p>
+                            <p>Desde aquí puedes gestionar tu perfil y acceder a todas las funcionalidades disponibles para tu cuenta.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Stats Cards -->
+            <div class="row">
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">person</i>
+                                    <p>Perfil</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text">1</h5>
+                                    <p class="no-margin">Usuario</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-amber-amber gradient-shadow min-height-100 white-text animate fadeLeft">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">access_time</i>
+                                    <p>Última Sesión</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="session-time">Ahora</h5>
+                                    <p class="no-margin">Activa</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-green-teal gradient-shadow min-height-100 white-text animate fadeLeft">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">security</i>
+                                    <p>Rol</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="user-role">Usuario</h5>
+                                    <p class="no-margin">Activo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">verified_user</i>
+                                    <p>Estado</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text">OK</h5>
+                                    <p class="no-margin">Verificado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Information Card -->
+            <div class="row">
+                <div class="col s12 l8">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">
+                                <i class="material-icons left">info</i>
+                                Información Personal
+                            </span>
+                            
+                            <div class="user-info" id="user-info">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <a href="/profile.html" class="btn blue darken-2">
+                                <i class="material-icons left">edit</i>
+                                Editar Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 l4">
+                    <div class="card">
+                        <div class="card-content center-align">
+                            <span class="card-title">
+                                <i class="material-icons left">account_circle</i>
+                                Foto de Perfil
+                            </span>
+                            <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="profile-image">
+                        </div>
+                        <div class="card-action center-align">
+                            <a href="/profile.html" class="btn-small blue darken-2">
+                                <i class="material-icons left">photo_camera</i>
+                                Cambiar Foto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col s12">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">
+                                <i class="material-icons left">settings</i>
+                                Acciones Rápidas
+                            </span>
+                            
+                            <div class="row">
+                                <div class="col s12 m6 l4">
+                                    <a href="/profile.html" class="btn-large waves-effect waves-light blue darken-2 full-width">
+                                        <i class="material-icons left">person</i>
+                                        Ver Mi Perfil
+                                    </a>
+                                </div>
+                                <div class="col s12 m6 l4">
+                                    <a href="#" onclick="refreshData()" class="btn-large waves-effect waves-light green darken-2 full-width">
+                                        <i class="material-icons left">refresh</i>
+                                        Actualizar Datos
+                                    </a>
+                                </div>
+                                <div class="col s12 m6 l4">
+                                    <a href="#" onclick="authManager.logout()" class="btn-large waves-effect waves-light red darken-2 full-width">
+                                        <i class="material-icons left">exit_to_app</i>
+                                        Cerrar Sesión
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/app.js"></script>
+    
+    <script>
+        let currentUser = null;
+
+        async function loadUserData() {
+            try {
+                showLoading(true);
+                currentUser = await authManager.fetchUserData();
+                
+                if (currentUser) {
+                    // Actualizar mensaje de bienvenida
+                    const welcomeMsg = document.getElementById('welcome-message');
+                    welcomeMsg.textContent = `Bienvenido ${currentUser.name} ${currentUser.lastName}, aquí están tus datos`;
+                    
+                    // Actualizar rol en las cards
+                    const roleElement = document.getElementById('user-role');
+                    roleElement.textContent = currentUser.roles ? currentUser.roles.join(', ') : 'Usuario';
+                    
+                    // Actualizar avatar
+                    const avatar = document.getElementById('user-avatar');
+                    if (currentUser.url_profile) {
+                        avatar.src = currentUser.url_profile;
+                        avatar.onerror = function() {
+                            this.src = 'https://via.placeholder.com/150';
+                        };
+                    }
+                    
+                    // Llenar información personal
+                    const userInfoDiv = document.getElementById('user-info');
+                    userInfoDiv.innerHTML = `
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <p><strong><i class="material-icons tiny">person</i> Nombre:</strong> ${currentUser.name} ${currentUser.lastName}</p>
+                                <p><strong><i class="material-icons tiny">email</i> Email:</strong> ${currentUser.email}</p>
+                                <p><strong><i class="material-icons tiny">phone</i> Teléfono:</strong> ${currentUser.phoneNumber || 'No especificado'}</p>
+                            </div>
+                            <div class="col s12 m6">
+                                <p><strong><i class="material-icons tiny">cake</i> Fecha de Nacimiento:</strong> ${currentUser.birthdate ? formatDate(currentUser.birthdate) : 'No especificado'}</p>
+                                <p><strong><i class="material-icons tiny">security</i> Roles:</strong> ${currentUser.roles ? currentUser.roles.join(', ') : 'Usuario'}</p>
+                                <p><strong><i class="material-icons tiny">home</i> Dirección:</strong> ${currentUser.adress || 'No especificado'}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('dashboard-content').style.display = 'block';
+                }
+            } catch (error) {
+                showError('Error al cargar los datos del usuario: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function refreshData() {
+            M.toast({html: 'Actualizando datos...', classes: 'blue'});
+            loadUserData();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Materialize
+            M.AutoInit();
+            
+            // Solo verificar autenticación básica
+            if (!authManager.token) {
+                window.location.href = '/signin.html';
+                return;
+            }
+            
+            // Cargar datos del usuario
+            loadUserData();
+            
+            // Actualizar tiempo de sesión cada minuto
+            setInterval(() => {
+                const sessionTimeElement = document.getElementById('session-time');
+                const now = new Date();
+                sessionTimeElement.textContent = now.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }, 60000);
+        });
+    </script>
+</body>
+</html>

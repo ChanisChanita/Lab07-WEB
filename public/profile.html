@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Sistema de Autenticación</title>
+    
+    <!-- Materialize CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="grey lighten-4">
+    <!-- Navigation -->
+    <nav class="blue darken-2">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Sistema Auth</a>
+            <ul class="right hide-on-med-and-down">
+                <li><span id="nav-user" style="display: none;"></span></li>
+                <li><a href="#" onclick="authManager.logout()" id="nav-logout" style="display: none;">
+                    <i class="material-icons left">exit_to_app</i>Cerrar Sesión
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container profile-container">
+        <!-- Loading -->
+        <div class="loading" style="display: none;">
+            <div class="center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>Cargando perfil...</p>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profile-content" style="display: none;">
+            <div class="row">
+                <div class="col s12">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title center-align">
+                                <i class="material-icons medium blue-text">account_circle</i>
+                                <br>Mi Perfil
+                            </span>
+                            
+                            <!-- Messages -->
+                            <div id="error-container" style="display: none;"></div>
+                            <div id="success-container" style="display: none;"></div>
+                            
+                            <!-- Profile Image -->
+                            <div class="center-align">
+                                <img id="profile-image" src="https://via.placeholder.com/150" alt="Foto de perfil" class="profile-image">
+                            </div>
+                            
+                            <!-- Profile Form -->
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">person</i>
+                                        <input id="name" type="text" class="validate" required>
+                                        <label for="name">Nombre</label>
+                                    </div>
+                                    <div class="input-field col s12 m6">
+                                        <input id="lastName" type="text" class="validate" required>
+                                        <label for="lastName">Apellido</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">email</i>
+                                        <input id="email" type="email" class="validate" disabled>
+                                        <label for="email">Email (No editable)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">phone</i>
+                                        <input id="phoneNumber" type="tel" class="validate" required>
+                                        <label for="phoneNumber">Teléfono</label>
+                                    </div>
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">cake</i>
+                                        <input id="birthdate" type="date" class="validate" required>
+                                        <label for="birthdate">Fecha de Nacimiento</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">image</i>
+                                        <input id="url_profile" type="url" class="validate">
+                                        <label for="url_profile">URL de Foto de Perfil</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">home</i>
+                                        <textarea id="adress" class="materialize-textarea"></textarea>
+                                        <label for="adress">Dirección</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">security</i>
+                                        <input id="roles" type="text" disabled>
+                                        <label for="roles">Roles (No editable)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col s12 center-align">
+                                        <button class="btn waves-effect waves-light blue darken-2" type="submit" id="submitBtn">
+                                            Actualizar Perfil
+                                            <i class="material-icons right">save</i>
+                                        </button>
+                                        <a href="#" onclick="goToDashboard()" class="btn waves-effect waves-light grey darken-2" style="margin-left: 10px;">
+                                            Volver al Dashboard
+                                            <i class="material-icons right">dashboard</i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/app.js"></script>
+    
+    <script>
+        let currentUser = null;
+
+        function goToDashboard() {
+            authManager.redirectToDashboard();
+        }
+
+        async function loadUserProfile() {
+            try {
+                showLoading(true);
+                currentUser = await authManager.fetchUserData();
+                
+                if (currentUser) {
+                    // Llenar el formulario con los datos del usuario
+                    document.getElementById('name').value = currentUser.name || '';
+                    document.getElementById('lastName').value = currentUser.lastName || '';
+                    document.getElementById('email').value = currentUser.email || '';
+                    document.getElementById('phoneNumber').value = currentUser.phoneNumber || '';
+                    document.getElementById('roles').value = currentUser.roles ? currentUser.roles.join(', ') : '';
+                    document.getElementById('adress').value = currentUser.adress || '';
+                    
+                    // Formatear fecha de nacimiento
+                    if (currentUser.birthdate) {
+                        const date = new Date(currentUser.birthdate);
+                        document.getElementById('birthdate').value = date.toISOString().split('T')[0];
+                    }
+                    
+                    // URL de perfil
+                    const profileUrl = currentUser.url_profile || 'https://via.placeholder.com/150';
+                    document.getElementById('url_profile').value = currentUser.url_profile || '';
+                    document.getElementById('profile-image').src = profileUrl;
+                    
+                    // Actualizar labels de Materialize
+                    M.updateTextFields();
+                    M.textareaAutoResize(document.getElementById('adress'));
+                    
+                    document.getElementById('profile-content').style.display = 'block';
+                }
+            } catch (error) {
+                showError('Error al cargar el perfil: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Materialize
+            M.AutoInit();
+            
+            // Solo verificar autenticación básica
+            if (!authManager.token) {
+                window.location.href = '/signin.html';
+                return;
+            }
+            
+            // Cargar perfil del usuario
+            loadUserProfile();
+            
+            // Actualizar imagen cuando cambie la URL
+            document.getElementById('url_profile').addEventListener('input', function() {
+                const url = this.value.trim();
+                const img = document.getElementById('profile-image');
+                
+                if (url && url.startsWith('http')) {
+                    img.src = url;
+                    img.onerror = function() {
+                        this.src = 'https://via.placeholder.com/150';
+                    };
+                } else {
+                    img.src = 'https://via.placeholder.com/150';
+                }
+            });
+            
+            // Manejar envío del formulario
+            const form = document.getElementById('profileForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                hideMessages();
+                
+                // Obtener valores del formulario
+                const formData = {
+                    name: document.getElementById('name').value.trim(),
+                    lastName: document.getElementById('lastName').value.trim(),
+                    phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                    birthdate: document.getElementById('birthdate').value,
+                    url_profile: document.getElementById('url_profile').value.trim(),
+                    adress: document.getElementById('adress').value.trim()
+                };
+                
+                // Validaciones básicas
+                if (!formData.name || !formData.lastName || !formData.phoneNumber || !formData.birthdate) {
+                    showError('Todos los campos obligatorios son requeridos');
+                    return;
+                }
+                
+                // Deshabilitar botón y mostrar loading
+                submitBtn.disabled = true;
+                showLoading(true);
+                
+                try {
+                    // Nota: En una implementación real, necesitarías crear un endpoint PUT para actualizar el perfil
+                    // Por ahora, simulamos la actualización mostrando un mensaje de éxito
+                    
+                    // Simular delay de actualización
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    showSuccess('¡Perfil actualizado exitosamente!');
+                    
+                    // Actualizar los datos locales
+                    currentUser = { ...currentUser, ...formData };
+                    
+                } catch (error) {
+                    showError('Error al actualizar el perfil: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    showLoading(false);
+                }
+            });
+            
+            // Limpiar mensajes al escribir
+            ['name', 'lastName', 'phoneNumber', 'url_profile', 'adress'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', hideMessages);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

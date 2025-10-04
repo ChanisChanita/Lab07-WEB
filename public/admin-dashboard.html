@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrador - Sistema de Autenticación</title>
+    
+    <!-- Materialize CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="grey lighten-4">
+    <!-- Navigation -->
+    <nav class="red darken-2">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Admin Panel</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/profile.html">
+                    <i class="material-icons left">person</i>Mi Perfil
+                </a></li>
+                <li><span id="nav-user" style="display: none; margin-right: 20px;"></span></li>
+                <li><a href="#" onclick="authManager.logout()" id="nav-logout" style="display: none;">
+                    <i class="material-icons left">exit_to_app</i>Cerrar Sesión
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container dashboard-container">
+        <!-- Loading -->
+        <div class="loading" style="display: none;">
+            <div class="center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-red-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>Cargando panel de administración...</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" style="display: none;">
+            <!-- Welcome Section -->
+            <div class="row">
+                <div class="col s12">
+                    <div class="card red lighten-5">
+                        <div class="card-content">
+                            <span class="card-title red-text text-darken-2">
+                                <i class="material-icons left">admin_panel_settings</i>
+                                <span id="welcome-message">Dashboard de Administrador</span>
+                            </span>
+                            <p class="flow-text">Panel de control para gestionar usuarios del sistema</p>
+                            <p>Desde aquí puedes ver todos los usuarios registrados en el sistema, consultar su información y gestionar los permisos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">people</i>
+                                    <p>Total Usuarios</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="total-users">-</h5>
+                                    <p class="no-margin">Registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-amber-amber gradient-shadow min-height-100 white-text">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">admin_panel_settings</i>
+                                    <p>Administradores</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="total-admins">-</h5>
+                                    <p class="no-margin">Activos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-green-teal gradient-shadow min-height-100 white-text">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">person</i>
+                                    <p>Usuarios Regulares</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="total-regular-users">-</h5>
+                                    <p class="no-margin">Activos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col s12 m6 l3">
+                    <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text">
+                        <div class="padding-4">
+                            <div class="row">
+                                <div class="col s7 m7">
+                                    <i class="material-icons background-round mt-5">today</i>
+                                    <p>Registros Hoy</p>
+                                </div>
+                                <div class="col s5 m5 right-align">
+                                    <h5 class="mb-0 white-text" id="today-registrations">-</h5>
+                                    <p class="no-margin">Nuevos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="error-container" style="display: none;"></div>
+            <div id="success-container" style="display: none;"></div>
+
+            <!-- Users Table -->
+            <div class="row">
+                <div class="col s12">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">
+                                <i class="material-icons left">people</i>
+                                Lista de Usuarios
+                                <a href="#" onclick="loadUsers()" class="btn-small blue darken-2 right">
+                                    <i class="material-icons left">refresh</i>Actualizar
+                                </a>
+                            </span>
+                            
+                            <div class="table-container">
+                                <table class="striped highlight responsive-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Avatar</th>
+                                            <th>Nombre Completo</th>
+                                            <th>Email</th>
+                                            <th>Teléfono</th>
+                                            <th>Roles</th>
+                                            <th>Fecha de Registro</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-table-body">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar información del usuario -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h4><i class="material-icons left">person</i>Información Detallada del Usuario</h4>
+            <div id="user-modal-content">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cerrar</a>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/app.js"></script>
+    
+    <script>
+        let allUsers = [];
+        let currentUser = null;
+
+        async function loadUsers() {
+            try {
+                showLoading(true);
+                hideMessages();
+                
+                const response = await fetch('/api/users', {
+                    headers: {
+                        'Authorization': `Bearer ${authManager.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allUsers = await response.json();
+                    renderUsersTable();
+                    updateStats();
+                } else if (response.status === 403) {
+                    showError('No tienes permisos para acceder a esta información');
+                } else {
+                    throw new Error('Error al cargar usuarios');
+                }
+            } catch (error) {
+                showError('Error al cargar usuarios: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            allUsers.forEach(user => {
+                const row = document.createElement('tr');
+                
+                // Formatear fecha de registro
+                const registrationDate = new Date(user.createdAt || Date.now()).toLocaleDateString('es-ES');
+                
+                // Determinar avatar
+                const avatar = user.url_profile || 'https://via.placeholder.com/40';
+                
+                row.innerHTML = `
+                    <td>
+                        <img src="${avatar}" alt="Avatar" class="circle" style="width: 40px; height: 40px;" 
+                             onerror="this.src='https://via.placeholder.com/40'">
+                    </td>
+                    <td>${user.name || ''} ${user.lastName || ''}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phoneNumber || 'No especificado'}</td>
+                    <td>
+                        ${user.roles.map(role => 
+                            `<span class="chip ${role === 'admin' ? 'red lighten-2 white-text' : 'blue lighten-2 white-text'}">${role}</span>`
+                        ).join(' ')}
+                    </td>
+                    <td>${registrationDate}</td>
+                    <td class="user-actions">
+                        <a href="#user-modal" class="btn-small blue darken-2 modal-trigger" 
+                           onclick="showUserDetails('${user.id}')">
+                            <i class="material-icons">visibility</i>
+                        </a>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStats() {
+            const totalUsers = allUsers.length;
+            const admins = allUsers.filter(user => user.roles.includes('admin')).length;
+            const regularUsers = totalUsers - admins;
+            
+            // Usuarios registrados hoy (simulado)
+            const today = new Date().toDateString();
+            const todayRegistrations = allUsers.filter(user => {
+                const userDate = new Date(user.createdAt || Date.now()).toDateString();
+                return userDate === today;
+            }).length;
+
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('total-admins').textContent = admins;
+            document.getElementById('total-regular-users').textContent = regularUsers;
+            document.getElementById('today-registrations').textContent = todayRegistrations;
+        }
+
+        function showUserDetails(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const modalContent = document.getElementById('user-modal-content');
+            modalContent.innerHTML = `
+                <div class="row">
+                    <div class="col s12 m4 center-align">
+                        <img src="${user.url_profile || 'https://via.placeholder.com/150'}" 
+                             alt="Avatar" class="circle responsive-img" style="max-width: 150px;"
+                             onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
+                    <div class="col s12 m8">
+                        <h6><i class="material-icons tiny">person</i> Información Personal</h6>
+                        <p><strong>Nombre completo:</strong> ${user.name || ''} ${user.lastName || ''}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Teléfono:</strong> ${user.phoneNumber || 'No especificado'}</p>
+                        <p><strong>Fecha de nacimiento:</strong> ${user.birthdate ? formatDate(user.birthdate) : 'No especificado'}</p>
+                        <p><strong>Dirección:</strong> ${user.adress || 'No especificado'}</p>
+                        <p><strong>Roles:</strong> ${user.roles.join(', ')}</p>
+                        <p><strong>Fecha de registro:</strong> ${formatDate(user.createdAt || Date.now())}</p>
+                        <p><strong>Última actualización:</strong> ${formatDate(user.updatedAt || Date.now())}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadCurrentUser() {
+            try {
+                currentUser = await authManager.fetchUserData();
+                if (currentUser) {
+                    const welcomeMsg = document.getElementById('welcome-message');
+                    welcomeMsg.textContent = `Dashboard de Administrador - ${currentUser.name} ${currentUser.lastName}`;
+                    
+                    // Verificar permisos de admin después de cargar los datos
+                    if (!authManager.hasRole('admin')) {
+                        window.location.href = '/403.html';
+                        return;
+                    }
+                }
+                return currentUser;
+            } catch (error) {
+                console.error('Error al cargar usuario actual:', error);
+                throw error;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Materialize
+            M.AutoInit();
+            
+            // Solo verificar autenticación básica, no roles aún
+            if (!authManager.token) {
+                window.location.href = '/signin.html';
+                return;
+            }
+            
+            // Cargar datos del usuario y verificar permisos después
+            loadCurrentUser().then(() => {
+                // Si llegamos aquí sin redirección, el usuario es admin
+                loadUsers();
+                document.getElementById('dashboard-content').style.display = 'block';
+            }).catch(error => {
+                console.error('Error al cargar usuario:', error);
+                window.location.href = '/signin.html';
+            });
+        });
+    </script>
+</body>
+</html>
